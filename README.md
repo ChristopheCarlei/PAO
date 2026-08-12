@@ -17,6 +17,10 @@ Chaque nombre possède une carte recto-verso :
 - **Deux sens de révision** — *Nombre → PAO* (on part du verso) et *PAO → Nombre*
   (on part du recto, phrase masquée), ou alternance automatique.
 - **Chronomètre** — temps de rappel par carte, moyenne affichée en fin de session.
+- **Ambiance par environnement** — l'interface prend l'atmosphère de la carte affichée :
+  le fond, les accents et le halo virent au noir du cimetière, à l'or du désert, au bleu de
+  l'océan… L'accueil reste neutre. Les cartes elles-mêmes ne changent jamais : leur rendu est
+  figé par le design validé.
 - **Progression par environnement** — un anneau par dizaine sur l'accueil (0x Cimetière …
   9x Ciel).
 - **Révision par environnement** — une session sur une seule dizaine, les 11 cartes mélangées.

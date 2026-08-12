@@ -12,7 +12,7 @@
   --text: #ECECEC;
   --text-card: #F4F3F0;
   --text-2: #9096a3;
-  --text-3: #6d7280;
+  --text-3: #838996;
   --accent: #4fb3e8;
   --ok: #3ba55d;
   --warn: #e3ae1c;
@@ -24,10 +24,82 @@
 
 * { box-sizing: border-box; }
 
+/* ============================================================
+   Ambiances par environnement
+   Le premier chiffre est porté par le décor : l'interface prend
+   l'atmosphère de la carte affichée. Les cartes, elles, ne changent
+   jamais — leur rendu est figé par le design validé.
+   ============================================================ */
+
+:root[data-env="0"] {           /* Cimetière — nuit noire, brouillard */
+  --bg: #0f1013; --surface: #17181d; --surface-2: #1e2027;
+  --border: #26282f; --border-2: #2f323a;
+  --accent: #8b93a1; --text-2: #8d93a0; --text-3: #7f838d;
+}
+:root[data-env="1"] {           /* Désert — sable doré, chaleur sèche */
+  --bg: #191510; --surface: #221d15; --surface-2: #2a241a;
+  --border: #332b1f; --border-2: #3f3527;
+  --accent: #e3ae1c; --text-2: #a2988a; --text-3: #8d867b;
+}
+:root[data-env="2"] {           /* Lune — gris froid, ciel noir */
+  --bg: #111216; --surface: #191b21; --surface-2: #202329;
+  --border: #2a2d34; --border-2: #343841;
+  --accent: #aab3bd; --text-2: #949aa5; --text-3: #81858e;
+}
+:root[data-env="3"] {           /* Océan — bleu profond */
+  --bg: #0c1826; --surface: #12212f; --surface-2: #172938;
+  --border: #1e3346; --border-2: #274056;
+  --accent: #4a9fe0; --text-2: #8ba3b8; --text-3: #788b9b;
+}
+:root[data-env="4"] {           /* Campagne — terre labourée */
+  --bg: #17130e; --surface: #201a13; --surface-2: #272018;
+  --border: #2f271d; --border-2: #3a3025;
+  --accent: #b57a3f; --text-2: #a19484; --text-3: #8c8378;
+}
+:root[data-env="5"] {           /* Banquise — glace, brouillard blanc */
+  --bg: #0e1418; --surface: #161d22; --surface-2: #1c242a;
+  --border: #252e35; --border-2: #2f3a42;
+  --accent: #bfe0ee; --text-2: #97a6b0; --text-3: #7a878f;
+}
+:root[data-env="6"] {           /* Mars — sol rouge, danger */
+  --bg: #180f0c; --surface: #211511; --surface-2: #291a15;
+  --border: #33201a; --border-2: #402a22;
+  --accent: #d4503f; --text-2: #a68b83; --text-3: #917f78;
+}
+:root[data-env="7"] {           /* Forêt — vert dense, humide */
+  --bg: #0d150f; --surface: #141d17; --surface-2: #1a251c;
+  --border: #212d24; --border-2: #2b3a2e;
+  --accent: #5aa76a; --text-2: #8ea394; --text-3: #78887e;
+}
+:root[data-env="8"] {           /* Villes — pavés orange */
+  --bg: #16130f; --surface: #1f1a14; --surface-2: #262019;
+  --border: #2e261d; --border-2: #3a3025;
+  --accent: #ef8214; --text-2: #a1958a; --text-3: #8b837b;
+}
+:root[data-env="9"] {           /* Ciel — bleu clair, nuages */
+  --bg: #0e161e; --surface: #151f29; --surface-2: #1b2731;
+  --border: #23303c; --border-2: #2d3e4c;
+  --accent: #4fb3e8; --text-2: #90a3b3; --text-3: #798996;
+}
+
+/* Halo diffus derrière la carte, à la couleur de l'environnement. */
+.env-glow {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 520ms ease;
+  background: radial-gradient(58% 42% at 50% 40%,
+    color-mix(in srgb, var(--accent) 16%, transparent), transparent 72%);
+}
+:root[data-env] .env-glow { opacity: 1; }
+
 html, body {
   margin: 0;
   padding: 0;
   background: var(--bg);
+  transition: background-color 520ms ease;
   color: var(--text);
   font-family: var(--font);
   -webkit-font-smoothing: antialiased;
@@ -38,6 +110,8 @@ html, body {
 body { min-height: 100dvh; }
 
 .app {
+  position: relative;
+  z-index: 1;
   max-width: 900px;
   margin: 0 auto;
   padding: 20px 16px calc(32px + env(safe-area-inset-bottom));
@@ -349,7 +423,7 @@ h1, h2, h3, p { margin: 0; }
 }
 .progress-fill {
   height: 100%;
-  background: var(--text);
+  background: var(--accent);
   border-radius: 999px;
   transition: width 220ms ease;
 }
@@ -369,7 +443,8 @@ h1, h2, h3, p { margin: 0; }
   font-size: 12.5px;
   letter-spacing: 0.1em;
   text-transform: uppercase;
-  color: var(--text-3);
+  color: var(--accent);
+  opacity: 0.85;
 }
 
 .answer {

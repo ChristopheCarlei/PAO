@@ -22,6 +22,11 @@
 
   var timerHandle = null;
 
+  /* Couleur d'accent de chaque environnement — reprend l'ancre de la dizaine,
+     éclaircie quand elle serait illisible sur fond sombre (cimetière, océan, forêt). */
+  var ENV_ACCENT = ['#8b93a1', '#e3ae1c', '#aab3bd', '#4a9fe0', '#b57a3f',
+    '#bfe0ee', '#d4503f', '#5aa76a', '#ef8214', '#4fb3e8'];
+
   /* ============================================================
      Utilitaires
      ============================================================ */
@@ -294,8 +299,7 @@
       var st = Store.seriesStats(s, PAO.DECK);
       var p = Math.round((st.mastered / st.total) * 100);
       return '<button class="series-tile" data-action="series" data-tens="' + s.tens + '">' +
-        '<span class="ring" style="--p:' + p + ';--ring-color:' + PAO.ANCHOR_COLORS[s.tens] +
-          (s.tens === 0 ? ';--ring-color:#5a5f6b' : '') + '"><b>' + p + '</b></span>' +
+        '<span class="ring" style="--p:' + p + ';--ring-color:' + ENV_ACCENT[s.tens] + '"><b>' + p + '</b></span>' +
         '<span><span class="name">' + s.label + ' · ' + esc(s.env) + '</span>' +
         '<span class="sub">' + st.mastered + '/' + st.total + ' maîtrisées' +
           (st.due ? ' · ' + st.due + ' dues' : '') + '</span></span>' +
@@ -649,6 +653,22 @@
      Rendu
      ============================================================ */
 
+  /* L'interface prend l'ambiance de l'environnement affiché ; neutre ailleurs. */
+  function applyEnvTheme() {
+    var tens = null;
+    if (state.view === 'session' && state.session) tens = currentCard().tens;
+    else if (state.view === 'browse') tens = state.browseSeries;
+
+    if (tens === null) delete document.documentElement.dataset.env;
+    else document.documentElement.dataset.env = String(tens);
+
+    var meta = document.querySelector('meta[name="theme-color"]');
+    if (meta) {
+      meta.setAttribute('content',
+        getComputedStyle(document.documentElement).getPropertyValue('--bg').trim() || '#14151a');
+    }
+  }
+
   function render() {
     var html;
     if (state.view === 'session' && state.session) html = viewSession();
@@ -658,6 +678,7 @@
     else if (state.view === 'settings') html = viewSettings();
     else html = viewHome();
 
+    applyEnvTheme();
     root.innerHTML = html + (state.toast ? '<div class="toast">' + esc(state.toast) + '</div>' : '');
     hydrate();
   }
