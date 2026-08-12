@@ -316,47 +316,50 @@
         (h.avg ? ' · ' + fmtSeconds(h.avg) : '') + '</span></div>';
     }).join('');
 
+    var modes = [
+      ['start-random', '🎲', 'Tirage aléatoire 00–99'],
+      ['dates', '📅', 'Dates historiques'],
+      ['start-all', '🔁', 'Tout le paquet'],
+      ['browse', '🗂', 'Parcourir les cartes']
+    ].map(function (m) {
+      return '<button class="mode-tile" data-action="' + m[0] + '">' +
+        '<i aria-hidden="true">' + m[1] + '</i><span>' + m[2] + '</span></button>';
+    }).join('');
+
     return '' +
-    '<div class="home-head">' +
-      '<div><div class="eyebrow">Logotopos</div>' +
-      '<h1 class="home-title">Cartes PAO</h1></div>' +
+    '<header class="home-head">' +
+      '<h1 class="home-title">Cartes PAO <span>· Logotopos</span></h1>' +
       '<button class="icon-btn" data-action="settings" aria-label="Réglages">⚙</button>' +
-    '</div>' +
+    '</header>' +
 
-    '<div class="stack stack-24">' +
+    '<div class="stack stack-groups">' +
 
-      '<div class="hero stack stack-12">' +
-        '<div class="row">' +
-          '<div><div class="eyebrow">À réviser</div>' +
-          '<div class="hero-figure">' + g.due + '</div></div>' +
-          '<div class="spacer"></div>' +
-          '<div class="center"><div class="tiny">Maîtrisées</div>' +
-          '<div style="font-size:18px;font-weight:700">' + pct + '%</div></div>' +
+      '<section class="hero">' +
+        '<div class="hero-lead">' +
+          '<div class="hero-figure">' + g.due + '</div>' +
+          '<div class="hero-label"><b>' + (g.due > 1 ? 'cartes à réviser' : 'carte à réviser') + '</b>' +
+            pct + ' % du paquet maîtrisé</div>' +
         '</div>' +
-        '<button class="btn btn--primary btn--block" data-action="start-srs">Réviser maintenant</button>' +
-      '</div>' +
+        '<div class="hero-stats">' +
+          '<div><b>' + g.mastered + '</b><span>maîtrisées</span></div>' +
+          '<div><b>' + g.seen + '</b><span>déjà vues</span></div>' +
+          '<div><b>' + (g.total - g.seen) + '</b><span>jamais vues</span></div>' +
+        '</div>' +
+        '<button class="btn btn--primary btn--cta" data-action="start-srs">Réviser maintenant</button>' +
+      '</section>' +
 
-      '<div class="stat-row">' +
-        '<div class="stat"><div class="v">' + g.mastered + '</div><div class="k">maîtrisées</div></div>' +
-        '<div class="stat"><div class="v">' + g.seen + '</div><div class="k">déjà vues</div></div>' +
-        '<div class="stat"><div class="v">' + (g.total - g.seen) + '</div><div class="k">jamais vues</div></div>' +
-      '</div>' +
-
-      '<div class="stack stack-12">' +
-        '<div class="eyebrow">Par environnement</div>' +
+      '<section class="stack stack-12">' +
+        '<h2 class="section-title">Par environnement</h2>' +
         '<div class="series-grid">' + tiles + '</div>' +
-      '</div>' +
+      '</section>' +
 
-      '<div class="stack stack-8">' +
-        '<div class="eyebrow">Autres modes</div>' +
-        '<button class="btn btn--block" data-action="start-random">🎲 Tirage aléatoire 00–99</button>' +
-        '<button class="btn btn--block" data-action="dates">📅 Dates historiques</button>' +
-        '<button class="btn btn--block" data-action="start-all">🔁 Réviser tout le paquet</button>' +
-        '<button class="btn btn--block" data-action="browse">🗂 Parcourir les 110 cartes</button>' +
-      '</div>' +
+      '<section class="stack stack-12">' +
+        '<h2 class="section-title">Autres modes</h2>' +
+        '<div class="mode-grid">' + modes + '</div>' +
+      '</section>' +
 
-      (hist ? '<div class="stack stack-8"><div class="eyebrow">Dernières sessions</div>' +
-        '<div class="recap-list">' + hist + '</div></div>' : '') +
+      (hist ? '<section class="stack stack-12"><h2 class="section-title">Dernières sessions</h2>' +
+        '<div class="recap-list">' + hist + '</div></section>' : '') +
 
     '</div>';
   }
@@ -425,19 +428,19 @@
     '<div class="session">' +
       '<div class="session-bar">' +
         '<button class="icon-btn" data-action="quit" aria-label="Quitter">✕</button>' +
-        '<div class="progress-track"><div class="progress-fill" style="width:' + pct + '%"></div></div>' +
+        '<div class="progress-track"><div class="progress-fill" style="transform:scaleX(' +
+          (pct / 100).toFixed(3) + ')"></div></div>' +
         '<span class="small muted" style="font-variant-numeric:tabular-nums">' +
           (s.idx + 1) + '/' + s.queue.length + '</span>' +
         (chrono ? '<span class="chrono" data-chrono>0.0 s</span>' : '') +
       '</div>' +
 
-      '<div class="center stack stack-8">' +
-        '<div class="prompt">' + (dir === 'num2pao' ? 'Nombre → PAO' : 'PAO → Nombre') + '</div>' +
-        '<div class="tiny">' + esc(s.title) + '</div>' +
-      '</div>' +
-
-      '<div class="session-card" data-swipe>' +
-        CV.flipCard(card, front, back, faceOpts) +
+      '<div class="session-stage">' +
+        '<div class="prompt">' + (dir === 'num2pao' ? 'Nombre → PAO' : 'PAO → Nombre') +
+          ' <span>· ' + esc(s.title) + '</span></div>' +
+        '<div class="session-card" data-swipe>' +
+          CV.flipCard(card, front, back, faceOpts) +
+        '</div>' +
       '</div>' +
 
       '<div class="stack stack-12 center" data-footer style="align-items:center;width:min(92vw,520px)">' +
