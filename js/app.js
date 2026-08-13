@@ -345,6 +345,9 @@
      des encarts génériques. Ouverte tant que le paquet n'a pas été entamé. */
   function explainerHTML(deckSeen) {
     var demo = PAO.byId('14');
+    /* Les trois segments en gras d'une carte sont, dans l'ordre,
+       le personnage, l'action et l'objet. */
+    var bolds = demo.parts.filter(function (p) { return p.bold; });
     var reglage = Store.getSettings().explainer;
     var ouvert = reglage === undefined || reglage === null
       ? deckSeen === 0
@@ -356,39 +359,65 @@
         '<span class="explainer-chev" aria-hidden="true"></span>' +
       '</summary>' +
       '<div class="explainer-body">' +
-        '<p class="explainer-lead">Chaque nombre de 0 à 99 est une scène : un personnage, ' +
-          'une action, un objet. C’est <b>l’objet qui porte le nombre</b> — ses deux ' +
-          'consonnes sont ses deux chiffres.</p>' +
+        '<p class="explainer-lead">Un nombre est abstrait ; une image ne l’est pas. ' +
+          'La méthode change chaque nombre en une petite scène — on retient la scène, ' +
+          'et le nombre vient avec.</p>' +
 
-        '<div class="explainer-demo">' +
-          '<div class="explainer-card">' +
+        '<div class="teach">' +
+          '<div class="teach-card">' +
             CV.staticCard(demo, 'recto', {}) +
-            '<p class="explainer-cardnum">Carte ' + demo.id + '</p>' +
+            '<p class="explainer-cardnum">La carte du nombre ' + demo.id + '</p>' +
           '</div>' +
 
-          '<ul class="explainer-steps">' +
-            '<li>' +
-              '<b>L’objet nomme le nombre</b>' +
-              '<span class="spell">' +
+          '<div class="teach-side">' +
+            '<p class="teach-hint">Cette scène tient en trois mots. ' +
+              'Touchez-en un pour voir son rôle.</p>' +
+
+            '<div class="teach-parts" aria-label="Les trois temps de la scène">' +
+              bolds.map(function (mot, i) {
+                var k = ['p', 'a', 'o'][i];
+                return '<button class="teach-part" data-action="teach" data-part="' + k +
+                  '" aria-pressed="' + (i === 0 ? 'true' : 'false') +
+                  '" aria-controls="teach-' + k + '">' +
+                  '<b>' + esc(mot.text) + '</b>' +
+                  '<span>' + ['personnage', 'action', 'objet'][i] + '</span>' +
+                '</button>';
+              }).join('') +
+            '</div>' +
+
+            '<div class="teach-panel" id="teach-p" data-part="p">' +
+              '<p><b>Le personnage, c’est qui agit.</b> Chaque nombre a le sien, ' +
+                'et il habite le monde du premier chiffre : la girafe est dans le désert ' +
+                'parce que 14 commence par 1.</p>' +
+              '<p class="teach-note"><i class="chip" style="background:' + ENV_ACCENT[demo.tens] +
+                '"></i>Dix mondes en tout, du cimetière au ciel.</p>' +
+            '</div>' +
+
+            '<div class="teach-panel" id="teach-a" data-part="a" hidden>' +
+              '<p><b>L’action, c’est ce qu’il fait.</b> Une scène qui bouge se retient ' +
+                'bien mieux qu’une image figée — et elle empêche de confondre deux ' +
+                'nombres qui se ressemblent.</p>' +
+              '<p class="teach-note">Sur la carte, le geste est toujours saisi en plein ' +
+                'milieu de l’action.</p>' +
+            '</div>' +
+
+            '<div class="teach-panel" id="teach-o" data-part="o" hidden>' +
+              '<p><b>L’objet est la clé : son nom épelle le nombre.</b></p>' +
+              '<p class="spell">' +
                 '<em style="color:' + ENV_ACCENT[1] + '">T</em>ou<em style="color:' +
                   ENV_ACCENT[4] + '">r</em>' +
                 '<span class="spell-arrow" aria-hidden="true">→</span>' +
                 '<em style="color:' + ENV_ACCENT[1] + '">1</em><em style="color:' +
                   ENV_ACCENT[4] + '">4</em>' +
-              '</span>' +
-              '<span>T vaut 1, R vaut 4. Les voyelles ne comptent pas.</span>' +
-            '</li>' +
-            '<li>' +
-              '<b><i class="chip" style="background:' + ENV_ACCENT[demo.tens] + '"></i>' +
-                'Le 1<sup>er</sup> chiffre se voit dans le lieu</b>' +
-              '<span>Dix mondes, du cimetière au ciel. Le <b>1</b>, c’est le désert.</span>' +
-            '</li>' +
-            '<li>' +
-              '<b><i class="chip" style="background:' + ENV_ACCENT[demo.unitDigit] + '"></i>' +
-                'Le 2<sup>e</sup> chiffre se voit dans la couleur</b>' +
-              '<span>Un élément isolé porte cette ancre. Le <b>4</b>, c’est le marron.</span>' +
-            '</li>' +
-          '</ul>' +
+              '</p>' +
+              '<p>La première consonne donne le premier chiffre, la seconde donne le ' +
+                'second. <b>T</b> vaut 1, <b>R</b> vaut 4 : <b>Tour = 14</b>. ' +
+                'Les voyelles ne comptent pas.</p>' +
+              '<p class="teach-note"><i class="chip" style="background:' +
+                ENV_ACCENT[demo.unitDigit] + '"></i>La couleur d’un élément isolé ' +
+                'redit le second chiffre : ici le 4, c’est le marron.</p>' +
+            '</div>' +
+          '</div>' +
         '</div>' +
 
         '<div class="code-strip">' +
@@ -918,6 +947,20 @@
     'next': next,
     'quit': quitSession,
     'grade': function (el) { gradeCard(Number(el.dataset.grade)); },
+
+    /* Changement d'onglet sans re-rendu : la page ne doit pas sauter sous le doigt. */
+    'teach': function (el) {
+      var part = el.dataset.part;
+      var bloc = el.closest('.teach');
+      Array.prototype.forEach.call(bloc.querySelectorAll('.teach-part'), function (b) {
+        b.setAttribute('aria-pressed', b === el ? 'true' : 'false');
+      });
+      Array.prototype.forEach.call(bloc.querySelectorAll('.teach-panel'), function (p) {
+        p.hidden = p.dataset.part !== part;
+      });
+      annonce(el.querySelector('span').textContent + ' : ' +
+        bloc.querySelector('.teach-panel:not([hidden])').textContent);
+    },
 
     'date-preset': function (el) { state.dateValue = el.dataset.value; state.focusDate = false; render(); },
     'date-review': function () {

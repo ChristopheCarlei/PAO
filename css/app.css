@@ -433,9 +433,70 @@ h1, h2, h3, p { margin: 0; }
 
 .explainer-lead { font-size: 14px; line-height: 1.5; color: var(--text); }
 
-.explainer-demo { display: flex; flex-direction: column; gap: var(--s4); }
+/* ---------- Démonstration interactive ---------- */
 
-.explainer-card { flex: 0 0 auto; }
+.teach { display: flex; flex-direction: column; gap: var(--s4); }
+.teach-card { flex: 0 0 auto; }
+.teach-side { display: flex; flex-direction: column; gap: var(--s3); flex: 1; }
+
+.teach-hint { font-size: 12.5px; color: var(--text-3); line-height: 1.45; }
+
+/* La phrase de la carte devient la commande : on touche le mot dont on veut
+   comprendre le rôle. */
+.teach-parts { display: flex; gap: var(--s2); flex-wrap: wrap; }
+
+.teach-part {
+  flex: 1 1 auto;
+  min-width: 88px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+  padding: var(--s2) var(--s3);
+  border-radius: 12px;
+  border: 1px solid var(--border-2);
+  background: var(--surface-2);
+  color: var(--text-2);
+  text-align: left;
+  transition: border-color 140ms ease, background 140ms ease, color 140ms ease;
+}
+.teach-part b { font-size: 15px; font-weight: 700; color: var(--text); }
+.teach-part span {
+  font-size: 10.5px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.teach-part:hover { border-color: var(--text-3); }
+.teach-part[aria-pressed="true"] {
+  border-color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 14%, var(--surface-2));
+  color: var(--text);
+}
+
+.teach-panel {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s2);
+  padding: var(--s3);
+  border-radius: 12px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--text-2);
+}
+.teach-panel b { color: var(--text); font-weight: 600; }
+.teach-note {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--s2);
+  font-size: 12px;
+  color: var(--text-3);
+  border-top: 1px solid var(--border);
+  padding-top: var(--s2);
+}
+.teach-note .chip { margin-top: 3px; }
+
 .explainer-cardnum {
   margin-top: var(--s2);
   font-size: 11px;
@@ -473,15 +534,17 @@ h1, h2, h3, p { margin: 0; }
   box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.22);
 }
 
-/* L'épellation du nombre : les deux consonnes prennent la couleur de leur chiffre. */
+/* L'épellation du nombre : les deux consonnes prennent la couleur de leur chiffre.
+   C'est le moment où le système se comprend — il a droit à la pleine taille. */
 .spell {
   display: flex;
   align-items: center;
-  gap: var(--s2);
-  font-size: 19px;
+  gap: var(--s3);
+  font-size: 26px;
   font-weight: 700;
   letter-spacing: 0.01em;
   color: var(--text);
+  padding: var(--s2) 0;
 }
 .spell em { font-style: normal; font-weight: 800; }
 .spell-arrow { color: var(--text-3); font-size: 14px; font-weight: 400; }
@@ -965,8 +1028,8 @@ h1, h2, h3, p { margin: 0; }
 
   /* Au large, la carte d'exemple se place à côté de sa décomposition. */
   .explainer { padding: var(--s5); }
-  .explainer-demo { flex-direction: row; align-items: flex-start; gap: var(--s5); }
-  .explainer-card { width: 190px; }
+  .teach { flex-direction: row; align-items: flex-start; gap: var(--s5); }
+  .teach-card { width: 280px; }
   .code-grid { grid-template-columns: repeat(10, 1fr); }
 }
 
