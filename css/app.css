@@ -130,14 +130,56 @@ button { font-family: inherit; cursor: pointer; }
 
 h1, h2, h3, p { margin: 0; }
 
+/* ---------- Surfaces du navigateur ----------
+   Anneau de focus, sélection et ascenseur arrivent avec des valeurs par défaut
+   qui n'appartiennent à aucun système de design. On les habille. */
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+.card-frame:focus-visible,
+.browse-flip:focus-visible { outline-offset: 4px; }
+
+::selection { background: color-mix(in srgb, var(--accent) 45%, transparent); color: var(--text); }
+
+* { scrollbar-width: thin; scrollbar-color: var(--border-2) transparent; }
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb {
+  background: var(--border-2);
+  border-radius: 999px;
+  border: 3px solid var(--bg);
+}
+::-webkit-scrollbar-thumb:hover { background: var(--text-3); }
+
+/* Les chiffres qui se comparent ou défilent ne doivent pas danser. */
+.hero-figure, .chrono, .deck-legend, .recap-num, .stat .v { font-variant-numeric: tabular-nums; }
+
+.sr-only {
+  position: absolute;
+  width: 1px; height: 1px;
+  margin: -1px; padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.icon { width: 20px; height: 20px; flex: 0 0 auto; }
+
 /* ---------- Blocs génériques ---------- */
 
-.eyebrow {
-  font-size: 12px;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: var(--text-3);
+/* Titre de vue. Chaque écran en porte un seul, et il porte son propre poids —
+   pas de sur-titre au-dessus. */
+.screen-title {
+  font-size: 19px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  margin: 0;
 }
+.screen-title--lg { font-size: 26px; }
 
 .stack { display: flex; flex-direction: column; }
 .stack-8 { gap: var(--s2); }
@@ -182,7 +224,6 @@ h1, h2, h3, p { margin: 0; }
 }
 .btn--primary:hover { background: #ffffff; }
 
-.btn--ghost { background: transparent; }
 .btn--block { width: 100%; }
 .btn--sm { padding: var(--s2) var(--s3); font-size: 13px; border-radius: 11px; }
 
@@ -226,18 +267,6 @@ h1, h2, h3, p { margin: 0; }
 .pill:hover { background: var(--surface); }
 .pill.is-active { background: #ECECEC; color: #14151a; border-color: #ECECEC; }
 
-.badge {
-  display: inline-flex;
-  align-items: center;
-  padding: var(--s1) var(--s2);
-  border-radius: 999px;
-  font-size: 11.5px;
-  font-weight: 600;
-  background: var(--surface-2);
-  color: var(--text-2);
-  border: 1px solid var(--border);
-}
-.badge--due { background: #1d2f3d; color: #7fc8f2; border-color: #244455; }
 
 /* ============================================================
    Carte
@@ -371,16 +400,36 @@ h1, h2, h3, p { margin: 0; }
 .hero-label { font-size: 14px; line-height: 1.3; color: var(--text-2); }
 .hero-label b { display: block; color: var(--text); font-weight: 600; }
 
-/* Statistiques serrées contre le chiffre qu'elles détaillent : même groupe. */
-.hero-stats {
+.hero-figure--done { font-size: 26px; letter-spacing: -0.01em; line-height: 1.15; }
+.hero-lead--done { flex-direction: column; align-items: flex-start; gap: var(--s1); }
+
+/* Une barre segmentée dit l'état du paquet entier d'un seul coup d'œil. */
+.deck-progress { display: flex; flex-direction: column; gap: var(--s2); }
+
+.deck-bar {
   display: flex;
-  border-top: 1px solid var(--border);
-  padding-top: var(--s3);
+  height: 6px;
+  border-radius: 999px;
+  overflow: hidden;
+  background: var(--border);
 }
-.hero-stats div { flex: 1; }
-.hero-stats div + div { border-left: 1px solid var(--border); padding-left: var(--s3); }
-.hero-stats b { display: block; font-size: 17px; font-weight: 700; }
-.hero-stats span { font-size: 11.5px; color: var(--text-3); }
+.deck-seg { display: block; min-width: 0; }
+.deck-seg--mastered { background: var(--accent); }
+.deck-seg--started { background: color-mix(in srgb, var(--accent) 40%, var(--border)); }
+.deck-seg--new { background: transparent; }
+
+.deck-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s2) var(--s3);
+  font-size: 11.5px;
+  color: var(--text-3);
+}
+.deck-legend span { display: inline-flex; align-items: center; gap: var(--s1); }
+.deck-legend .dot { width: 7px; height: 7px; border-radius: 50%; }
+.dot--mastered { background: var(--accent); }
+.dot--started { background: color-mix(in srgb, var(--accent) 40%, var(--border)); }
+.dot--new { background: var(--border); }
 
 .btn--cta { width: 100%; }
 
@@ -571,6 +620,14 @@ h1, h2, h3, p { margin: 0; }
 }
 
 .browse-item { display: flex; flex-direction: column; gap: var(--s2); }
+/* Le bouton n'apporte aucune apparence : la carte reste la seule chose visible. */
+.browse-flip {
+  all: unset;
+  display: block;
+  width: 100%;
+  cursor: pointer;
+  border-radius: 12px;
+}
 .browse-item .cap { font-size: 11px; color: var(--text-3); text-align: center; }
 
 /* ============================================================
@@ -718,6 +775,11 @@ h1, h2, h3, p { margin: 0; }
   .mode-tile { flex-direction: column; align-items: flex-start; gap: var(--s2); }
 }
 
+/* Le rappel des raccourcis clavier n'a rien à dire sur un écran tactile. */
+@media (hover: none) and (pointer: coarse) {
+  .kbd-hint { display: none; }
+}
+
 @media (prefers-reduced-motion: reduce) {
-  .card, .card-img, .progress-fill, .btn { transition-duration: 1ms; }
+  .card, .card-img, .progress-fill, .btn, .env-glow, html, body { transition-duration: 1ms; }
 }

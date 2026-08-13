@@ -27,6 +27,32 @@
   var ENV_ACCENT = ['#8b93a1', '#e3ae1c', '#aab3bd', '#4a9fe0', '#b57a3f',
     '#bfe0ee', '#d4503f', '#5aa76a', '#ef8214', '#4fb3e8'];
 
+  /* Icônes dessinées, une seule graisse de trait — pas d'emoji tenant lieu d'icône. */
+  var ICON_PATHS = {
+    settings: '<path d="M4 8h10M18 8h2M4 16h4M12 16h8"/>' +
+      '<circle cx="16" cy="8" r="2"/><circle cx="10" cy="16" r="2"/>',
+    close: '<path d="m6 6 12 12M18 6 6 18"/>',
+    back: '<path d="M15 5 8 12l7 7"/>',
+    dice: '<rect x="4" y="4" width="16" height="16" rx="4"/>' +
+      '<circle cx="9" cy="9" r="1.3" fill="currentColor" stroke="none"/>' +
+      '<circle cx="12" cy="12" r="1.3" fill="currentColor" stroke="none"/>' +
+      '<circle cx="15" cy="15" r="1.3" fill="currentColor" stroke="none"/>',
+    calendar: '<rect x="3.5" y="5.5" width="17" height="15" rx="3"/>' +
+      '<path d="M8 3.5v4M16 3.5v4M3.5 10.5h17"/>',
+    repeat: '<path d="M4 9a5 5 0 0 1 5-5h7M20 15a5 5 0 0 1-5 5H8"/>' +
+      '<path d="m13 1 3 3-3 3M11 23l-3-3 3-3"/>',
+    grid: '<rect x="3.5" y="3.5" width="7" height="7" rx="2"/>' +
+      '<rect x="13.5" y="3.5" width="7" height="7" rx="2"/>' +
+      '<rect x="3.5" y="13.5" width="7" height="7" rx="2"/>' +
+      '<rect x="13.5" y="13.5" width="7" height="7" rx="2"/>'
+  };
+
+  function icon(name) {
+    return '<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" ' +
+      'stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' +
+      ICON_PATHS[name] + '</svg>';
+  }
+
   /* ============================================================
      Utilitaires
      ============================================================ */
@@ -55,8 +81,15 @@
 
   function plural(n, one, many) { return n + ' ' + (n <= 1 ? one : many); }
 
+  /* Ce qui change à l'écran sans recharger la page doit être dit à voix haute. */
+  function annonce(texte) {
+    var el = document.getElementById('annonce');
+    if (el) el.textContent = texte;
+  }
+
   function toast(message) {
     state.toast = message;
+    annonce(message);
     render();
     setTimeout(function () {
       if (state.toast === message) { state.toast = null; render(); }
@@ -180,6 +213,9 @@
     var card = document.querySelector('.card');
     if (card) card.classList.add('is-flipped');
     renderSessionFooter();
+
+    var c = currentCard();
+    annonce('Réponse : ' + c.id + ', ' + c.phrase);
   }
 
   function gradeCard(g) {
@@ -291,6 +327,20 @@
      Vue : accueil
      ============================================================ */
 
+  /* Quand tout est à jour, dire quand la prochaine carte revient. */
+  function nextDueLabel() {
+    var now = Date.now();
+    var soonest = null;
+    PAO.DECK.forEach(function (c) {
+      var st = Store.cardState(c.id);
+      if (st && (soonest === null || st.due < soonest)) soonest = st.due;
+    });
+    if (soonest === null) return 'Le paquet entier reste à découvrir.';
+    var delta = soonest - now;
+    if (delta <= 0) return 'Des cartes sont prêtes.';
+    return 'Prochaine carte dans ' + fmtInterval(delta) + '.';
+  }
+
   function viewHome() {
     var g = Store.globalStats(PAO.DECK);
     var pct = Math.round((g.mastered / g.total) * 100);
@@ -317,35 +367,63 @@
     }).join('');
 
     var modes = [
-      ['start-random', '🎲', 'Tirage aléatoire 00–99'],
-      ['dates', '📅', 'Dates historiques'],
-      ['start-all', '🔁', 'Tout le paquet'],
-      ['browse', '🗂', 'Parcourir les cartes']
+      ['start-random', 'dice', 'Tirage aléatoire 00–99'],
+      ['dates', 'calendar', 'Dates historiques'],
+      ['start-all', 'repeat', 'Tout le paquet'],
+      ['browse', 'grid', 'Parcourir les cartes']
     ].map(function (m) {
       return '<button class="mode-tile" data-action="' + m[0] + '">' +
-        '<i aria-hidden="true">' + m[1] + '</i><span>' + m[2] + '</span></button>';
+        icon(m[1]) + '<span>' + m[2] + '</span></button>';
     }).join('');
+
+    /* Une seule barre segmentée dit tout le paquet d'un coup d'œil :
+       maîtrisées, entamées, jamais vues. Trois chiffres isolés n'en disaient pas plus. */
+    var started = g.seen - g.mastered;
+    var deckBar = '<div class="deck-bar" role="img" aria-label="' +
+        g.mastered + ' cartes maîtrisées, ' + started + ' entamées, ' +
+        (g.total - g.seen) + ' jamais vues sur ' + g.total + '">' +
+        '<span class="deck-seg deck-seg--mastered" style="flex:' + g.mastered + '"></span>' +
+        '<span class="deck-seg deck-seg--started" style="flex:' + started + '"></span>' +
+        '<span class="deck-seg deck-seg--new" style="flex:' + (g.total - g.seen) + '"></span>' +
+      '</div>' +
+      '<div class="deck-legend" aria-hidden="true">' +
+        '<span><i class="dot dot--mastered"></i>' + g.mastered + ' maîtrisées</span>' +
+        '<span><i class="dot dot--started"></i>' + started + ' entamées</span>' +
+        '<span><i class="dot dot--new"></i>' + (g.total - g.seen) + ' jamais vues</span>' +
+      '</div>';
+
+    /* État vide : quand rien n'est dû, le bouton principal ne doit pas être un cul-de-sac. */
+    var vide = g.due === 0;
+    var prochaine = vide ? nextDueLabel() : '';
+
+    var lead = vide
+      ? '<div class="hero-lead hero-lead--done">' +
+          '<div class="hero-figure hero-figure--done">Tout est à jour</div>' +
+          '<div class="hero-label">' + prochaine + '</div>' +
+        '</div>'
+      : '<div class="hero-lead">' +
+          '<div class="hero-figure">' + g.due + '</div>' +
+          '<div class="hero-label"><b>' +
+            (g.due > 1 ? 'cartes à réviser' : 'carte à réviser') + '</b>' +
+            pct + ' % du paquet maîtrisé</div>' +
+        '</div>';
+
+    var cta = vide
+      ? '<button class="btn btn--cta" data-action="start-all">Réviser en avance</button>'
+      : '<button class="btn btn--primary btn--cta" data-action="start-srs">Réviser maintenant</button>';
 
     return '' +
     '<header class="home-head">' +
       '<h1 class="home-title">Cartes PAO <span>· Logotopos</span></h1>' +
-      '<button class="icon-btn" data-action="settings" aria-label="Réglages">⚙</button>' +
+      '<button class="icon-btn" data-action="settings" aria-label="Réglages">' + icon('settings') + '</button>' +
     '</header>' +
 
     '<div class="stack stack-groups">' +
 
       '<section class="hero">' +
-        '<div class="hero-lead">' +
-          '<div class="hero-figure">' + g.due + '</div>' +
-          '<div class="hero-label"><b>' + (g.due > 1 ? 'cartes à réviser' : 'carte à réviser') + '</b>' +
-            pct + ' % du paquet maîtrisé</div>' +
-        '</div>' +
-        '<div class="hero-stats">' +
-          '<div><b>' + g.mastered + '</b><span>maîtrisées</span></div>' +
-          '<div><b>' + g.seen + '</b><span>déjà vues</span></div>' +
-          '<div><b>' + (g.total - g.seen) + '</b><span>jamais vues</span></div>' +
-        '</div>' +
-        '<button class="btn btn--primary btn--cta" data-action="start-srs">Réviser maintenant</button>' +
+        lead +
+        '<div class="deck-progress">' + deckBar + '</div>' +
+        cta +
       '</section>' +
 
       '<section class="stack stack-12">' +
@@ -427,7 +505,7 @@
     return '' +
     '<div class="session">' +
       '<div class="session-bar">' +
-        '<button class="icon-btn" data-action="quit" aria-label="Quitter">✕</button>' +
+        '<button class="icon-btn" data-action="quit" aria-label="Quitter la session">' + icon('close') + '</button>' +
         '<div class="progress-track"><div class="progress-fill" style="transform:scaleX(' +
           (pct / 100).toFixed(3) + ')"></div></div>' +
         '<span class="small muted" style="font-variant-numeric:tabular-nums">' +
@@ -447,7 +525,7 @@
         sessionFooterHTML() +
       '</div>' +
 
-      '<p class="tiny center">Espace : retourner · 1 / 2 / 3 : noter · ← → : naviguer</p>' +
+      '<p class="tiny center kbd-hint">Espace : retourner · 1 / 2 / 3 : noter · ← → : naviguer</p>' +
     '</div>';
   }
 
@@ -473,8 +551,8 @@
     return '' +
     '<div class="stack stack-24">' +
       '<div class="center stack stack-8">' +
-        '<div class="eyebrow">Session terminée</div>' +
-        '<h1 class="home-title">' + esc(sum.title) + '</h1>' +
+        '<h1 class="screen-title screen-title--lg">Session terminée</h1>' +
+        '<p class="small muted">' + esc(sum.title) + '</p>' +
       '</div>' +
 
       '<div class="summary-grid">' +
@@ -511,8 +589,12 @@
       var tag = !st ? 'jamais vue'
         : Store.isMastered(c.id) ? 'maîtrisée'
         : 'palier ' + st.step;
+      /* Bouton et non div : la carte doit se retourner au clavier comme à la souris. */
       return '<div class="browse-item">' +
-        CV.flipCard(c, 'recto', 'verso', {}) +
+        '<button class="browse-flip" aria-pressed="false" aria-label="' +
+          esc(c.id) + ' — ' + esc(c.phrase) + '. Retourner la carte.">' +
+          CV.flipCard(c, 'recto', 'verso', {}) +
+        '</button>' +
         '<div class="cap">' + esc(c.id) + ' · ' + tag + '</div>' +
       '</div>';
     }).join('');
@@ -520,8 +602,8 @@
     return '' +
     '<div class="stack stack-16">' +
       '<div class="row">' +
-        '<button class="icon-btn" data-action="home" aria-label="Retour">←</button>' +
-        '<h1 style="font-size:19px;font-weight:700;margin:0">Catalogue</h1>' +
+        '<button class="icon-btn" data-action="home" aria-label="Revenir à l’accueil">' + icon('back') + '</button>' +
+        '<h1 class="screen-title">Catalogue</h1>' +
         '<div class="spacer"></div>' +
         '<button class="btn btn--sm" data-action="series" data-tens="' + tens + '">Réviser cette série</button>' +
       '</div>' +
@@ -564,8 +646,8 @@
     return '' +
     '<div class="stack stack-16">' +
       '<div class="row">' +
-        '<button class="icon-btn" data-action="home" aria-label="Retour">←</button>' +
-        '<h1 style="font-size:19px;font-weight:700;margin:0">Dates historiques</h1>' +
+        '<button class="icon-btn" data-action="home" aria-label="Revenir à l’accueil">' + icon('back') + '</button>' +
+        '<h1 class="screen-title">Dates historiques</h1>' +
       '</div>' +
 
       '<input class="date-input" data-date inputmode="numeric" pattern="[0-9]*" maxlength="8" ' +
@@ -602,8 +684,8 @@
     return '' +
     '<div class="stack stack-16">' +
       '<div class="row">' +
-        '<button class="icon-btn" data-action="home" aria-label="Retour">←</button>' +
-        '<h1 style="font-size:19px;font-weight:700;margin:0">Réglages</h1>' +
+        '<button class="icon-btn" data-action="home" aria-label="Revenir à l’accueil">' + icon('back') + '</button>' +
+        '<h1 class="screen-title">Réglages</h1>' +
       '</div>' +
 
       '<div class="field">' +
@@ -796,11 +878,18 @@
       return;
     }
 
-    /* Clic sur une carte : retourner. */
-    var card = e.target.closest('.card');
-    if (!card) return;
-    if (state.view === 'session') { reveal(); return; }
-    if (state.view === 'browse') card.classList.toggle('is-flipped');
+    /* Catalogue : la cible est le bouton (clavier) ou un élément de la carte (souris).
+       On part donc du bouton, jamais de la carte, sinon l'activation clavier ne fait rien. */
+    var host = e.target.closest('.browse-flip');
+    if (host) {
+      var inner = host.querySelector('.card');
+      var flipped = inner.classList.toggle('is-flipped');
+      host.setAttribute('aria-pressed', flipped ? 'true' : 'false');
+      return;
+    }
+
+    /* Clic sur la carte de session : retourner. */
+    if (e.target.closest('.card') && state.view === 'session') reveal();
   });
 
   root.addEventListener('input', function (e) {
