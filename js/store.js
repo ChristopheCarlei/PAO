@@ -122,9 +122,21 @@
   /* ---------- Statistiques ---------- */
 
   /* Une carte est « maîtrisée » à partir de l'intervalle 7 jours (3e palier). */
+  var MASTERY_STEP = 3;
+
   function isMastered(id) {
     var st = progress[id];
-    return !!st && st.step >= 3;
+    return !!st && st.step >= MASTERY_STEP;
+  }
+
+  /* Avancement d'une carte vers la maîtrise, de 0 à 1.
+     La maîtrise demandant trois révisions réparties sur plusieurs jours, un
+     indicateur binaire resterait à zéro pendant une semaine entière : il ne
+     dirait rien du travail déjà fait. Celui-ci bouge à chaque révision. */
+  function cardProgress(id) {
+    var st = progress[id];
+    if (!st) return 0;
+    return Math.min(st.step, MASTERY_STEP) / MASTERY_STEP;
   }
 
   function dueCards(deck, now) {
@@ -135,27 +147,36 @@
   function seriesStats(series, deck) {
     var ids = deck.filter(function (c) { return c.tens === series.tens; })
       .map(function (c) { return c.id; });
-    var mastered = 0, seen = 0, due = 0;
+    var mastered = 0, seen = 0, due = 0, avance = 0;
     var now = Date.now();
     ids.forEach(function (id) {
       if (isMastered(id)) mastered++;
       if (!isNew(id)) seen++;
       if (isDue(id, now)) due++;
+      avance += cardProgress(id);
     });
-    return { total: ids.length, mastered: mastered, seen: seen, due: due };
+    return {
+      total: ids.length,
+      mastered: mastered,
+      seen: seen,
+      due: due,
+      progress: ids.length ? avance / ids.length : 0
+    };
   }
 
   function globalStats(deck) {
-    var mastered = 0, seen = 0;
+    var mastered = 0, seen = 0, avance = 0;
     deck.forEach(function (c) {
       if (isMastered(c.id)) mastered++;
       if (!isNew(c.id)) seen++;
+      avance += cardProgress(c.id);
     });
     return {
       total: deck.length,
       mastered: mastered,
       seen: seen,
-      due: dueCards(deck).length
+      due: dueCards(deck).length,
+      progress: deck.length ? avance / deck.length : 0
     };
   }
 
@@ -209,6 +230,7 @@
     isNew: isNew,
     isDue: isDue,
     isMastered: isMastered,
+    cardProgress: cardProgress,
     preview: preview,
     grade: grade,
     dueCards: dueCards,

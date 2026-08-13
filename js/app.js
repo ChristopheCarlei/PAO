@@ -410,13 +410,15 @@
 
   function viewHome() {
     var g = Store.globalStats(PAO.DECK);
-    var pct = Math.round((g.mastered / g.total) * 100);
+    var pct = Math.round(g.progress * 100);
 
     var tiles = PAO.SERIES.map(function (s) {
       var st = Store.seriesStats(s, PAO.DECK);
-      var p = Math.round((st.mastered / st.total) * 100);
+      var p = Math.round(st.progress * 100);
+      /* L'anneau montre l'avancement — il bouge à chaque révision.
+         La ligne dessous donne le compte strict des cartes maîtrisées. */
       return '<button class="series-tile" data-env="' + s.tens + '" data-action="series" data-tens="' + s.tens + '">' +
-        '<span class="ring" style="--p:' + p + '"><b>' + p + '</b></span>' +
+        '<span class="ring" style="--p:' + p + '" role="img" aria-label="Avancement ' + p + ' %"><b>' + p + '</b></span>' +
         '<span><span class="name">' + s.label + ' · ' + esc(s.env) + '</span>' +
         '<span class="sub">' + st.mastered + '/' + st.total + ' maîtrisées' +
           (st.due ? ' · ' + st.due + ' dues' : '') + '</span></span>' +
@@ -472,7 +474,7 @@
           '<div class="hero-figure">' + g.due + '</div>' +
           '<div class="hero-label"><b>' +
             (g.due > 1 ? 'cartes à réviser' : 'carte à réviser') + '</b>' +
-            pct + ' % du paquet maîtrisé</div>' +
+            pct + ' % du paquet appris</div>' +
         '</div>';
 
     var cta = vide
