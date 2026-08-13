@@ -348,8 +348,8 @@
     var tiles = PAO.SERIES.map(function (s) {
       var st = Store.seriesStats(s, PAO.DECK);
       var p = Math.round((st.mastered / st.total) * 100);
-      return '<button class="series-tile" data-action="series" data-tens="' + s.tens + '">' +
-        '<span class="ring" style="--p:' + p + ';--ring-color:' + ENV_ACCENT[s.tens] + '"><b>' + p + '</b></span>' +
+      return '<button class="series-tile" data-env="' + s.tens + '" data-action="series" data-tens="' + s.tens + '">' +
+        '<span class="ring" style="--p:' + p + '"><b>' + p + '</b></span>' +
         '<span><span class="name">' + s.label + ' · ' + esc(s.env) + '</span>' +
         '<span class="sub">' + st.mastered + '/' + st.total + ' maîtrisées' +
           (st.due ? ' · ' + st.due + ' dues' : '') + '</span></span>' +

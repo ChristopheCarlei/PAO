@@ -232,25 +232,34 @@ h1, h2, h3, p { margin: 0; }
 
 .btn[disabled] { opacity: 0.45; pointer-events: none; }
 
+/* Le bouton fait vraiment 44 px — toute sa boîte est cliquable.
+   Le cercle visible, lui, reste à 38 px : c'est le tracé, pas la cible. */
 .icon-btn {
   position: relative;
-  width: 38px;
-  height: 38px;
+  width: 44px;
+  height: 44px;
   padding: 0;
+  border: 0;
   border-radius: 50%;
-  border: 1px solid var(--border-2);
   background: transparent;
   color: var(--text-2);
-  font-size: 17px;
   line-height: 1;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   flex: 0 0 auto;
 }
-/* La marque reste à 38 px, la zone tactile atteint 44 px. */
-.icon-btn::after { content: ''; position: absolute; inset: -3px; border-radius: 50%; }
-.icon-btn:hover { background: var(--surface); color: var(--text); }
+.icon-btn::before {
+  content: '';
+  position: absolute;
+  inset: 3px;
+  border: 1px solid var(--border-2);
+  border-radius: 50%;
+  transition: background 120ms ease;
+}
+.icon-btn .icon { position: relative; }
+.icon-btn:hover { color: var(--text); }
+.icon-btn:hover::before { background: var(--surface); }
 
 /* Pastilles de série */
 .pill {
@@ -472,19 +481,42 @@ h1, h2, h3, p { margin: 0; }
   gap: var(--s2);
 }
 
+/* Chaque environnement porte sa propre couleur d'ancre. La grille est la seule
+   région de l'accueil qui prend la couleur : elle sert l'orientation — reconnaître
+   un monde au premier coup d'œil — et non la décoration. */
+.series-tile[data-env="0"] { --tile: #8b93a1; }
+.series-tile[data-env="1"] { --tile: #e3ae1c; }
+.series-tile[data-env="2"] { --tile: #aab3bd; }
+.series-tile[data-env="3"] { --tile: #4a9fe0; }
+.series-tile[data-env="4"] { --tile: #b57a3f; }
+.series-tile[data-env="5"] { --tile: #bfe0ee; }
+.series-tile[data-env="6"] { --tile: #d4503f; }
+.series-tile[data-env="7"] { --tile: #5aa76a; }
+.series-tile[data-env="8"] { --tile: #ef8214; }
+.series-tile[data-env="9"] { --tile: #4fb3e8; }
+
 .series-tile {
   display: flex;
   align-items: center;
   gap: var(--s3);
   padding: var(--s3);
   border-radius: 14px;
-  border: 1px solid var(--border);
-  background: var(--surface);
+  border: 1px solid color-mix(in srgb, var(--tile) 20%, var(--border));
+  background:
+    linear-gradient(142deg,
+      color-mix(in srgb, var(--tile) 14%, var(--surface)) 0%,
+      var(--surface) 64%);
   color: var(--text);
   text-align: left;
-  transition: background 120ms ease, border-color 120ms ease;
+  transition: background 140ms ease, border-color 140ms ease;
 }
-.series-tile:hover { background: var(--surface-2); border-color: var(--border-2); }
+.series-tile:hover {
+  border-color: color-mix(in srgb, var(--tile) 42%, var(--border));
+  background:
+    linear-gradient(142deg,
+      color-mix(in srgb, var(--tile) 26%, var(--surface-2)) 0%,
+      var(--surface-2) 72%);
+}
 
 .ring {
   position: relative;
@@ -494,19 +526,26 @@ h1, h2, h3, p { margin: 0; }
   border-radius: 50%;
   display: grid;
   place-items: center;
-  background: conic-gradient(var(--ring-color) calc(var(--p) * 1%), var(--border) 0);
+  background: conic-gradient(var(--tile, var(--accent)) calc(var(--p) * 1%),
+    color-mix(in srgb, var(--tile, var(--accent)) 18%, var(--border)) 0);
 }
 .ring::after {
   content: '';
   position: absolute;
   inset: 4px;
   border-radius: 50%;
-  background: var(--surface);
+  background: color-mix(in srgb, var(--tile, var(--accent)) 10%, var(--surface));
 }
 .ring b { position: relative; z-index: 1; font-size: 11.5px; font-weight: 700; }
 
 .series-tile .name { font-size: 13.5px; font-weight: 600; }
-.series-tile .sub { font-size: 11px; color: var(--text-3); margin-top: 2px; }
+/* Sur une surface teintée, le texte secondaire se dérive de cette teinte
+   plutôt que de rester un gris générique délavé. */
+.series-tile .sub {
+  font-size: 11px;
+  color: color-mix(in srgb, var(--tile) 15%, var(--text-2));
+  margin-top: 2px;
+}
 
 /* ============================================================
    Session
