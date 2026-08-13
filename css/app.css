@@ -484,38 +484,46 @@ h1, h2, h3, p { margin: 0; }
 /* Chaque environnement porte sa propre couleur d'ancre. La grille est la seule
    région de l'accueil qui prend la couleur : elle sert l'orientation — reconnaître
    un monde au premier coup d'œil — et non la décoration. */
-.series-tile[data-env="0"] { --tile: #8b93a1; }
-.series-tile[data-env="1"] { --tile: #e3ae1c; }
-.series-tile[data-env="2"] { --tile: #aab3bd; }
-.series-tile[data-env="3"] { --tile: #4a9fe0; }
-.series-tile[data-env="4"] { --tile: #b57a3f; }
-.series-tile[data-env="5"] { --tile: #bfe0ee; }
-.series-tile[data-env="6"] { --tile: #d4503f; }
-.series-tile[data-env="7"] { --tile: #5aa76a; }
-.series-tile[data-env="8"] { --tile: #ef8214; }
-.series-tile[data-env="9"] { --tile: #4fb3e8; }
+.series-tile[data-env="0"] { --tile: #8b93a1; --env-img: url(../assets/env/env0.webp); }
+.series-tile[data-env="1"] { --tile: #e3ae1c; --env-img: url(../assets/env/env1.webp); }
+.series-tile[data-env="2"] { --tile: #aab3bd; --env-img: url(../assets/env/env2.webp); }
+.series-tile[data-env="3"] { --tile: #4a9fe0; --env-img: url(../assets/env/env3.webp); }
+.series-tile[data-env="4"] { --tile: #b57a3f; --env-img: url(../assets/env/env4.webp); }
+.series-tile[data-env="5"] { --tile: #bfe0ee; --env-img: url(../assets/env/env5.webp); }
+.series-tile[data-env="6"] { --tile: #d4503f; --env-img: url(../assets/env/env6.webp); }
+.series-tile[data-env="7"] { --tile: #5aa76a; --env-img: url(../assets/env/env7.webp); }
+.series-tile[data-env="8"] { --tile: #ef8214; --env-img: url(../assets/env/env8.webp); }
+.series-tile[data-env="9"] { --tile: #4fb3e8; --env-img: url(../assets/env/env9.webp); }
 
+/* La tuile montre le monde lui-même. Le voile est calculé pour que le texte
+   tienne le contraste même sur l'image la plus claire (la banquise). */
 .series-tile {
+  position: relative;
   display: flex;
   align-items: center;
   gap: var(--s3);
   padding: var(--s3);
+  min-height: 84px;
   border-radius: 14px;
-  border: 1px solid color-mix(in srgb, var(--tile) 20%, var(--border));
-  background:
-    linear-gradient(142deg,
-      color-mix(in srgb, var(--tile) 14%, var(--surface)) 0%,
-      var(--surface) 64%);
+  border: 1px solid color-mix(in srgb, var(--tile) 26%, var(--border));
+  background-color: var(--surface);
+  background-image:
+    linear-gradient(94deg,
+      rgba(14, 15, 19, 0.95) 0%,
+      rgba(14, 15, 19, 0.93) 54%,
+      rgba(14, 15, 19, 0.42) 78%,
+      color-mix(in srgb, var(--tile) 26%, transparent) 100%),
+    var(--env-img);
+  background-size: cover, cover;
+  background-position: center, center;
   color: var(--text);
   text-align: left;
-  transition: background 140ms ease, border-color 140ms ease;
+  overflow: hidden;
+  transition: border-color 140ms ease, transform 140ms ease;
 }
 .series-tile:hover {
-  border-color: color-mix(in srgb, var(--tile) 42%, var(--border));
-  background:
-    linear-gradient(142deg,
-      color-mix(in srgb, var(--tile) 26%, var(--surface-2)) 0%,
-      var(--surface-2) 72%);
+  border-color: color-mix(in srgb, var(--tile) 60%, var(--border));
+  transform: translateY(-1px);
 }
 
 .ring {
@@ -527,23 +535,23 @@ h1, h2, h3, p { margin: 0; }
   display: grid;
   place-items: center;
   background: conic-gradient(var(--tile, var(--accent)) calc(var(--p) * 1%),
-    color-mix(in srgb, var(--tile, var(--accent)) 18%, var(--border)) 0);
+    rgba(255, 255, 255, 0.16) 0);
 }
 .ring::after {
   content: '';
   position: absolute;
   inset: 4px;
   border-radius: 50%;
-  background: color-mix(in srgb, var(--tile, var(--accent)) 10%, var(--surface));
+  background: rgba(0, 0, 0, 0.62);
 }
 .ring b { position: relative; z-index: 1; font-size: 11.5px; font-weight: 700; }
 
 .series-tile .name { font-size: 13.5px; font-weight: 600; }
-/* Sur une surface teintée, le texte secondaire se dérive de cette teinte
+/* Sur l'image, le texte secondaire se dérive de la teinte du monde
    plutôt que de rester un gris générique délavé. */
 .series-tile .sub {
   font-size: 11px;
-  color: color-mix(in srgb, var(--tile) 15%, var(--text-2));
+  color: color-mix(in srgb, var(--tile) 30%, #dfe3ea);
   margin-top: 2px;
 }
 
