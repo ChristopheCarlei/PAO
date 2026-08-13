@@ -10,6 +10,10 @@
   var ANCHOR_COLORS = ['#111111', '#e3ae1c', '#aab3bd', '#1d4f8a', '#8a5327',
     '#f2fbff', '#c0392b', '#2f6b3a', '#ef8214', '#4fb3e8'];
 
+  /* Code phonétique (système majeur) : c'est lui qui fait le lien entre un
+     nombre et son objet. Les deux consonnes de l'objet sont les deux chiffres. */
+  var PHONEMES = ['S·Z·C', 'T·D', 'N', 'M', 'R', 'L', 'CH·J', 'K·G', 'F·V', 'P·B'];
+
   var SERIES = [
     {
       tens: 0, label: '0x', env: 'Cimetière', verso: 'assets/verso/Verso00.webp',
@@ -224,6 +228,7 @@
   global.PAO = {
     ANCHOR_NAMES: ANCHOR_NAMES,
     ANCHOR_COLORS: ANCHOR_COLORS,
+    PHONEMES: PHONEMES,
     SERIES: SERIES,
     DECK: DECK,
     PAIRS: PAIRS,

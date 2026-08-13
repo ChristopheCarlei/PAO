@@ -473,6 +473,51 @@ h1, h2, h3, p { margin: 0; }
   box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.22);
 }
 
+/* L'épellation du nombre : les deux consonnes prennent la couleur de leur chiffre. */
+.spell {
+  display: flex;
+  align-items: center;
+  gap: var(--s2);
+  font-size: 19px;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  color: var(--text);
+}
+.spell em { font-style: normal; font-weight: 800; }
+.spell-arrow { color: var(--text-3); font-size: 14px; font-weight: 400; }
+
+/* Le code phonétique : c'est une donnée, une grille est ici la bonne forme. */
+.code-strip {
+  border-top: 1px solid var(--border);
+  padding-top: var(--s3);
+  display: flex;
+  flex-direction: column;
+  gap: var(--s2);
+}
+.code-title {
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-3);
+  font-weight: 600;
+}
+.code-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: var(--s1);
+}
+.code-cell {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0;
+  padding: var(--s2) var(--s1);
+  border-radius: 8px;
+  background: var(--surface-2);
+}
+.code-cell b { font-size: 19px; font-weight: 800; font-variant-numeric: tabular-nums; line-height: 1.2; }
+.code-cell span { font-size: 10.5px; color: var(--text-2); letter-spacing: 0.02em; }
+
 .explainer-foot {
   font-size: 12.5px;
   line-height: 1.5;
@@ -922,6 +967,7 @@ h1, h2, h3, p { margin: 0; }
   .explainer { padding: var(--s5); }
   .explainer-demo { flex-direction: row; align-items: flex-start; gap: var(--s5); }
   .explainer-card { width: 190px; }
+  .code-grid { grid-template-columns: repeat(10, 1fr); }
 }
 
 /* Le rappel des raccourcis clavier n'a rien à dire sur un écran tactile. */

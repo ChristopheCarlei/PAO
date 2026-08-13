@@ -356,8 +356,9 @@
         '<span class="explainer-chev" aria-hidden="true"></span>' +
       '</summary>' +
       '<div class="explainer-body">' +
-        '<p class="explainer-lead">Chaque nombre de 0 à 99 est une scène à trois temps : ' +
-          'un personnage, une action, un objet. Retenir le nombre, c’est retenir la scène.</p>' +
+        '<p class="explainer-lead">Chaque nombre de 0 à 99 est une scène : un personnage, ' +
+          'une action, un objet. C’est <b>l’objet qui porte le nombre</b> — ses deux ' +
+          'consonnes sont ses deux chiffres.</p>' +
 
         '<div class="explainer-demo">' +
           '<div class="explainer-card">' +
@@ -367,20 +368,38 @@
 
           '<ul class="explainer-steps">' +
             '<li>' +
-              '<b>Personnage · Action · Objet</b>' +
-              '<span>' + CV.phraseHTML(demo) + '</span>' +
+              '<b>L’objet nomme le nombre</b>' +
+              '<span class="spell">' +
+                '<em style="color:' + ENV_ACCENT[1] + '">T</em>ou<em style="color:' +
+                  ENV_ACCENT[4] + '">r</em>' +
+                '<span class="spell-arrow" aria-hidden="true">→</span>' +
+                '<em style="color:' + ENV_ACCENT[1] + '">1</em><em style="color:' +
+                  ENV_ACCENT[4] + '">4</em>' +
+              '</span>' +
+              '<span>T vaut 1, R vaut 4. Les voyelles ne comptent pas.</span>' +
             '</li>' +
             '<li>' +
               '<b><i class="chip" style="background:' + ENV_ACCENT[demo.tens] + '"></i>' +
-                'Le 1<sup>er</sup> chiffre est le lieu</b>' +
-              '<span>Dix mondes, du cimetière au ciel. Ici le <b>1</b> est le désert.</span>' +
+                'Le 1<sup>er</sup> chiffre se voit dans le lieu</b>' +
+              '<span>Dix mondes, du cimetière au ciel. Le <b>1</b>, c’est le désert.</span>' +
             '</li>' +
             '<li>' +
-              '<b><i class="chip" style="background:' + demo.anchor + '"></i>' +
-                'Le 2<sup>e</sup> chiffre est la couleur</b>' +
-              '<span>Un objet isolé porte cette ancre. Ici le <b>4</b> est marron.</span>' +
+              '<b><i class="chip" style="background:' + ENV_ACCENT[demo.unitDigit] + '"></i>' +
+                'Le 2<sup>e</sup> chiffre se voit dans la couleur</b>' +
+              '<span>Un élément isolé porte cette ancre. Le <b>4</b>, c’est le marron.</span>' +
             '</li>' +
           '</ul>' +
+        '</div>' +
+
+        '<div class="code-strip">' +
+          '<p class="code-title">Le code des consonnes</p>' +
+          '<div class="code-grid">' +
+            PAO.PHONEMES.map(function (p, d) {
+              return '<div class="code-cell">' +
+                '<b style="color:' + ENV_ACCENT[d] + '">' + d + '</b>' +
+                '<span>' + p + '</span></div>';
+            }).join('') +
+          '</div>' +
         '</div>' +
 
         '<p class="explainer-foot">Une date se découpe en paires : <b>1492</b> devient ' +
