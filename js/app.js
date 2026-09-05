@@ -433,6 +433,9 @@
 
         '<p class="explainer-foot">Une date se découpe en paires : <b>1492</b> devient ' +
           '<b>14</b> puis <b>92</b> — deux scènes à enchaîner en une seule image mentale.</p>' +
+        '<img class="explainer-date" src="assets/date1492.webp" loading="lazy" ' +
+          'width="1400" height="781" ' +
+          'alt="1492 : la girafe (14) joue du piano (92) sur la plage où débarque Christophe Colomb">' +
       '</div>' +
     '</details>';
   }
