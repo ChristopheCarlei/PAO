@@ -225,7 +225,7 @@
   /* Les 100 cartes à deux chiffres, pour le tirage aléatoire et les dates. */
   var PAIRS = DECK.filter(function (c) { return !c.single; });
 
-  /* Les 45 dates historiques illustrées (dossier Dates/ du projet),
+  /* Les dates historiques illustrées (dossier Dates/ du projet),
      dans l'ordre chronologique. `value` = chiffres saisis dans le champ,
      `label` = affichage (− pour av. J.-C.), `event` = libellé court de la
      grille, `events` = tous les événements de la scène quand elle en fusionne
@@ -233,6 +233,7 @@
      l'image, `img` = nom de fichier quand il diffère de `value`. */
   var DATES = [
     { value: '753',  label: '−753',  event: 'Fondation de Rome', place: 'Bord du Tibre', img: '0753' },
+    { value: '604',  label: '−604',  event: 'Naissance de Lao Tseu', place: 'Village de Quren (Chine)', img: '0604' },
     { value: '563',  label: '−563',  event: 'Naissance de Bouddha', place: 'Jardin de Lumbini', img: '0563' },
     { value: '509',  label: '−509',  event: 'République romaine',
       events: ['Expulsion de Tarquin le Superbe', 'Serment de Brutus'], place: 'Forum de Rome', img: '0509' },
@@ -255,6 +256,7 @@
       events: ['Abdication de Romulus Augustule'], place: 'Ravenne' },
     { value: '496',  label: '496',   event: 'Baptême de Clovis', place: 'Baptistère de Reims' },
     { value: '622',  label: '622',   event: 'Hégire', place: 'Médine' },
+    { value: '732',  label: '732',   event: 'Bataille de Poitiers', place: 'Champ de bataille de Poitiers' },
     { value: '751',  label: '751',   event: 'Sacre de Pépin le Bref',
       events: ['Onction de Pépin le Bref', 'Tonsure de Childéric III'], place: 'Abbatiale de Soissons' },
     { value: '800',  label: '800',   event: 'Couronnement de Charlemagne', place: 'Saint-Pierre de Rome' },
