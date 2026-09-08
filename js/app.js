@@ -720,12 +720,13 @@
      Vue : dates historiques
      ============================================================ */
 
+  /* Découpe en paires depuis la gauche, chiffre isolé en fin :
+     293 → 29 + 3, 800 → 80 + 0 (convention des dates validées). */
   function chunkDate(value) {
     var digits = value.replace(/\D/g, '');
     var chunks = [];
-    var i = 0;
-    if (digits.length % 2 === 1) { chunks.push(digits[0]); i = 1; }
-    for (; i < digits.length; i += 2) chunks.push(digits.substr(i, 2));
+    for (var i = 0; i + 2 <= digits.length; i += 2) chunks.push(digits.substr(i, 2));
+    if (digits.length % 2 === 1) chunks.push(digits[digits.length - 1]);
     return chunks;
   }
 
@@ -744,7 +745,7 @@
 
     var hint = cards.length >= 2
       ? 'Enchaînez les ' + cards.length + ' scènes en une seule image mentale, dans l\'ordre.'
-      : 'Saisissez une date à 4 chiffres (par exemple 1492) — elle est découpée en paires.';
+      : 'Saisissez une date (par exemple 1492) ou choisissez-la ci-dessous : elle est découpée en paires de gauche à droite.';
 
     return '' +
     '<div class="stack stack-16">' +
@@ -756,17 +757,23 @@
       '<input class="date-input" data-date inputmode="numeric" pattern="[0-9]*" maxlength="8" ' +
         'placeholder="1492" value="' + esc(value) + '" aria-label="Date à mémoriser">' +
 
-      '<div class="row row-wrap" style="gap:8px">' +
-        ['1492', '1515', '1789', '1969'].map(function (d) {
-          return '<button class="pill" data-action="date-preset" data-value="' + d + '">' + d + '</button>';
-        }).join('') +
-      '</div>' +
-
       '<p class="small muted center">' + hint + '</p>' +
 
       (cards.length ? '<div class="date-chain">' + chain + '</div>' +
         '<button class="btn btn--block" data-action="date-review">Réviser ces ' +
         cards.length + ' cartes</button>' : '') +
+
+      '<h2 class="section-title">' + PAO.DATES.length + ' dates illustrées</h2>' +
+      '<div class="date-presets">' +
+        PAO.DATES.map(function (d) {
+          var active = d.value === value ? ' is-active' : '';
+          return '<button class="date-preset' + active + '" data-action="date-preset" ' +
+            'data-value="' + d.value + '">' +
+            '<span class="dp-year">' + d.label + '</span>' +
+            '<span class="dp-event">' + d.event + '</span>' +
+          '</button>';
+        }).join('') +
+      '</div>' +
     '</div>';
   }
 
@@ -965,7 +972,12 @@
         bloc.querySelector('.teach-panel:not([hidden])').textContent);
     },
 
-    'date-preset': function (el) { state.dateValue = el.dataset.value; state.focusDate = false; render(); },
+    'date-preset': function (el) {
+      state.dateValue = el.dataset.value;
+      state.focusDate = false;
+      render();
+      window.scrollTo(0, 0);
+    },
     'date-review': function () {
       var ids = chunkDate(state.dateValue).filter(function (id) { return PAO.byId(id); });
       if (ids.length) startFromIds(ids, 'Date ' + state.dateValue);

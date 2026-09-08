@@ -225,6 +225,56 @@
   /* Les 100 cartes à deux chiffres, pour le tirage aléatoire et les dates. */
   var PAIRS = DECK.filter(function (c) { return !c.single; });
 
+  /* Les 44 dates historiques illustrées (dossier Dates/ du projet),
+     dans l'ordre chronologique. `value` = chiffres saisis dans le champ,
+     `label` = affichage (− pour av. J.-C.), `event` = événement mémorisé. */
+  var DATES = [
+    { value: '753',  label: '−753',  event: 'Fondation de Rome' },
+    { value: '563',  label: '−563',  event: 'Naissance de Bouddha' },
+    { value: '509',  label: '−509',  event: 'République romaine' },
+    { value: '490',  label: '−490',  event: 'Bataille de Marathon' },
+    { value: '333',  label: '−333',  event: 'Bataille d’Issos' },
+    { value: '52',   label: '−52',   event: 'Alésia' },
+    { value: '46',   label: '−46',   event: 'Calendrier julien' },
+    { value: '27',   label: '−27',   event: 'Octave devient Auguste' },
+    { value: '64',   label: '64',    event: 'Incendie de Rome' },
+    { value: '293',  label: '293',   event: 'Tétrarchie' },
+    { value: '313',  label: '313',   event: 'Édit de Milan' },
+    { value: '410',  label: '410',   event: 'Sac de Rome par Alaric' },
+    { value: '451',  label: '451',   event: 'Champs Catalauniques' },
+    { value: '476',  label: '476',   event: 'Fin de l’Empire d’Occident' },
+    { value: '496',  label: '496',   event: 'Baptême de Clovis' },
+    { value: '622',  label: '622',   event: 'Hégire' },
+    { value: '751',  label: '751',   event: 'Sacre de Pépin le Bref' },
+    { value: '800',  label: '800',   event: 'Couronnement de Charlemagne' },
+    { value: '987',  label: '987',   event: 'Sacre d’Hugues Capet' },
+    { value: '1099', label: '1099',  event: 'Prise de Jérusalem' },
+    { value: '1204', label: '1204',  event: 'Sac de Constantinople' },
+    { value: '1453', label: '1453',  event: 'Chute de Constantinople' },
+    { value: '1455', label: '1455',  event: 'Bible de Gutenberg' },
+    { value: '1492', label: '1492',  event: 'Découverte de l’Amérique' },
+    { value: '1498', label: '1498',  event: 'Vasco de Gama en Inde' },
+    { value: '1515', label: '1515',  event: 'Marignan' },
+    { value: '1517', label: '1517',  event: '95 thèses de Luther' },
+    { value: '1522', label: '1522',  event: 'Premier tour du monde' },
+    { value: '1530', label: '1530',  event: 'Diète d’Augsbourg' },
+    { value: '1789', label: '1789',  event: 'Prise de la Bastille' },
+    { value: '1804', label: '1804',  event: 'Sacre de Napoléon' },
+    { value: '1805', label: '1805',  event: 'Austerlitz · Trafalgar' },
+    { value: '1885', label: '1885',  event: 'Vaccin contre la rage' },
+    { value: '1933', label: '1933',  event: 'Hitler chancelier' },
+    { value: '1957', label: '1957',  event: 'Traité de Rome' },
+    { value: '1961', label: '1961',  event: 'Mur de Berlin · Gagarine' },
+    { value: '1962', label: '1962',  event: 'Crise de Cuba · Évian' },
+    { value: '1963', label: '1963',  event: 'Assassinat de Kennedy' },
+    { value: '1969', label: '1969',  event: 'Premiers pas sur la Lune' },
+    { value: '1982', label: '1982',  event: 'Lancement du Minitel' },
+    { value: '1989', label: '1989',  event: 'Chute du mur de Berlin' },
+    { value: '1990', label: '1990',  event: 'Naissance du Web' },
+    { value: '1991', label: '1991',  event: 'Fin de l’URSS' },
+    { value: '1992', label: '1992',  event: 'Traité de Maastricht' }
+  ];
+
   global.PAO = {
     ANCHOR_NAMES: ANCHOR_NAMES,
     ANCHOR_COLORS: ANCHOR_COLORS,
@@ -232,6 +282,7 @@
     SERIES: SERIES,
     DECK: DECK,
     PAIRS: PAIRS,
+    DATES: DATES,
     byId: function (id) { return BY_ID[id] || null; }
   };
 })(window);
