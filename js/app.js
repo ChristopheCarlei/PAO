@@ -747,6 +747,19 @@
       ? 'Enchaînez les ' + cards.length + ' scènes en une seule image mentale, dans l\'ordre.'
       : 'Saisissez une date (par exemple 1492) ou choisissez-la ci-dessous : elle est découpée en paires de gauche à droite.';
 
+    /* L'image historique de la date, si elle a été illustrée. */
+    var entry = null;
+    for (var i = 0; i < PAO.DATES.length; i++) {
+      if (PAO.DATES[i].value === value) { entry = PAO.DATES[i]; break; }
+    }
+    var photo = entry
+      ? '<figure class="date-photo">' +
+          '<img src="assets/dates/' + (entry.img || entry.value) + '.webp" loading="lazy" ' +
+            'alt="' + entry.label + ' · ' + entry.event + '">' +
+          '<figcaption>' + entry.label + ' · ' + entry.event + '</figcaption>' +
+        '</figure>'
+      : '';
+
     return '' +
     '<div class="stack stack-16">' +
       '<div class="row">' +
@@ -759,7 +772,7 @@
 
       '<p class="small muted center">' + hint + '</p>' +
 
-      (cards.length ? '<div class="date-chain">' + chain + '</div>' +
+      (cards.length ? '<div class="date-chain">' + chain + '</div>' + photo +
         '<button class="btn btn--block" data-action="date-review">Réviser ces ' +
         cards.length + ' cartes</button>' : '') +
 
