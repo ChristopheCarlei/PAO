@@ -924,10 +924,20 @@ h1, h2, h3, p { margin: 0; }
   border: 1px solid var(--border-2);
 }
 .date-photo figcaption {
-  font-size: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  text-align: center;
+}
+.date-photo .dp-events {
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--text-2);
+}
+.date-photo .dp-place {
+  font-size: 11.5px;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  text-align: center;
   color: var(--text-3);
 }
 

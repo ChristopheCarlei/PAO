@@ -752,13 +752,18 @@
     for (var i = 0; i < PAO.DATES.length; i++) {
       if (PAO.DATES[i].value === value) { entry = PAO.DATES[i]; break; }
     }
-    var photo = entry
-      ? '<figure class="date-photo">' +
-          '<img src="assets/dates/' + (entry.img || entry.value) + '.webp" loading="lazy" ' +
-            'alt="' + entry.label + ' · ' + entry.event + '">' +
-          '<figcaption>' + entry.label + ' · ' + entry.event + '</figcaption>' +
-        '</figure>'
-      : '';
+    var photo = '';
+    if (entry) {
+      var events = entry.events || [entry.event];
+      photo = '<figure class="date-photo">' +
+        '<img src="assets/dates/' + (entry.img || entry.value) + '.webp" loading="lazy" ' +
+          'alt="' + entry.label + ' · ' + events.join(' · ') + '">' +
+        '<figcaption>' +
+          '<span class="dp-events">' + entry.label + ' · ' + events.join(' · ') + '</span>' +
+          '<span class="dp-place">' + entry.place + '</span>' +
+        '</figcaption>' +
+      '</figure>';
+    }
 
     return '' +
     '<div class="stack stack-16">' +
