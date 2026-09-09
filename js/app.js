@@ -772,7 +772,11 @@
             '<img src="assets/dates/' + (entry.img || entry.value) + '.webp" loading="lazy" ' +
               'alt="' + esc(alt) + '">' +
           '</div>' +
-          '<div class="dcard-face dcard-face--back">' + back + '</div>' +
+          '<div class="dcard-face dcard-face--back">' +
+            '<img class="dv-bg" src="assets/dates/' + (entry.img || entry.value) + '.webp" ' +
+              'alt="" aria-hidden="true" loading="lazy">' +
+            back +
+          '</div>' +
         '</div>' +
       '</button>' +
       '<p class="dp-hint">Touchez la carte : date, événements, protagonistes et lieu au verso.</p>' +
