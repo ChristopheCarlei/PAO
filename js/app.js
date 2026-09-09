@@ -730,6 +730,55 @@
     return chunks;
   }
 
+  /* La date en gros chiffres, chaque chiffre dans son ancre couleur — le même
+     code que le verso des cartes nombres. Les paires du découpage mnémotechnique
+     restent légèrement espacées. */
+  function dateDigitsHTML(entry) {
+    var minus = entry.label.charAt(0) === '−' ? '<span class="dv-minus">−</span>' : '';
+    return minus + chunkDate(entry.value).map(function (ch) {
+      return '<span class="dv-chunk">' + ch.split('').map(function (d) {
+        return '<span style="color:' + PAO.ANCHOR_COLORS[Number(d)] + '">' + d + '</span>';
+      }).join('') + '</span>';
+    }).join('');
+  }
+
+  /* La carte de l'événement : recto = image de la scène, verso = date en
+     couleurs, événements, protagonistes et lieu. Touchée, elle se retourne. */
+  function datePhotoHTML(entry) {
+    var events = entry.events || [entry.event];
+    var alt = entry.label + ' · ' + events.join(' · ');
+
+    var back = '<div class="dv">' +
+      '<div class="dv-date">' +
+        '<span aria-hidden="true">' + dateDigitsHTML(entry) + '</span>' +
+        '<span class="sr-only">' + esc(entry.label) + '</span>' +
+      '</div>' +
+      '<div class="dv-block">' +
+        '<div class="dv-label">' + (events.length > 1 ? 'Événements' : 'Événement') + '</div>' +
+        events.map(function (ev) { return '<p class="dv-item">' + esc(ev) + '</p>'; }).join('') +
+      '</div>' +
+      (entry.who ? '<div class="dv-block">' +
+        '<div class="dv-label">' + (entry.who.length > 1 ? 'Protagonistes' : 'Protagoniste') + '</div>' +
+        '<p class="dv-item">' + entry.who.map(esc).join('<span class="dv-sep"> · </span>') + '</p>' +
+      '</div>' : '') +
+      '<div class="dv-place">' + esc(entry.place) + '</div>' +
+    '</div>';
+
+    return '<div class="date-photo">' +
+      '<button class="date-flip" aria-pressed="false" aria-label="' + esc(alt) +
+        '. Retourner la carte pour le détail.">' +
+        '<div class="dcard">' +
+          '<div class="dcard-face dcard-face--front">' +
+            '<img src="assets/dates/' + (entry.img || entry.value) + '.webp" loading="lazy" ' +
+              'alt="' + esc(alt) + '">' +
+          '</div>' +
+          '<div class="dcard-face dcard-face--back">' + back + '</div>' +
+        '</div>' +
+      '</button>' +
+      '<p class="dp-hint">Touchez la carte : date, événements, protagonistes et lieu au verso.</p>' +
+    '</div>';
+  }
+
   function viewDates() {
     var value = state.dateValue;
     var chunks = chunkDate(value);
@@ -752,18 +801,7 @@
     for (var i = 0; i < PAO.DATES.length; i++) {
       if (PAO.DATES[i].value === value) { entry = PAO.DATES[i]; break; }
     }
-    var photo = '';
-    if (entry) {
-      var events = entry.events || [entry.event];
-      photo = '<figure class="date-photo">' +
-        '<img src="assets/dates/' + (entry.img || entry.value) + '.webp" loading="lazy" ' +
-          'alt="' + entry.label + ' · ' + events.join(' · ') + '">' +
-        '<figcaption>' +
-          '<span class="dp-events">' + entry.label + ' · ' + events.join(' · ') + '</span>' +
-          '<span class="dp-place">' + entry.place + '</span>' +
-        '</figcaption>' +
-      '</figure>';
-    }
+    var photo = entry ? datePhotoHTML(entry) : '';
 
     return '' +
     '<div class="stack stack-16">' +
@@ -1044,6 +1082,16 @@
       var inner = host.querySelector('.card');
       var flipped = inner.classList.toggle('is-flipped');
       host.setAttribute('aria-pressed', flipped ? 'true' : 'false');
+      return;
+    }
+
+    /* Carte d'une date : recto image, verso détail de l'événement. */
+    var dhost = e.target.closest('.date-flip');
+    if (dhost) {
+      var dcard = dhost.querySelector('.dcard');
+      var dflip = dcard.classList.toggle('is-flipped');
+      dhost.setAttribute('aria-pressed', dflip ? 'true' : 'false');
+      if (dflip) annonce(dhost.querySelector('.dcard-face--back').textContent);
       return;
     }
 
